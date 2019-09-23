@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
@@ -19,11 +20,29 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
+    private void Update()
+    {
+        if (playerInput.actions.FindAction("Attack").triggered && !animator.GetBool("isAttacking"))
+        {
+            StartCoroutine(AttackCo());
+        }
+    }
+    private IEnumerator AttackCo()
+    {
+        animator.SetBool("isAttacking", true);
+        yield return null;
+        yield return new WaitForSeconds(.33f);
+        animator.SetBool("isAttacking", false);
+
+    }
     void FixedUpdate()
     {
-        UpdateAnimationAndMove();
+        if(!animator.GetBool("isAttacking"))
+        {
+            UpdateAnimationAndMove();
+        }
     }
-   
+
     void UpdateAnimationAndMove()
     {
         MoveCharacter();
