@@ -48,6 +48,14 @@ public class PlayerControls : IInputActionCollection
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""90312053-3df7-4c11-ab38-fa39c7e80112"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -200,7 +208,7 @@ public class PlayerControls : IInputActionCollection
                     ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Gamepad"",
+                    ""groups"": ""Gamepad"",
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -244,18 +252,7 @@ public class PlayerControls : IInputActionCollection
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Activate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""eed309c3-c461-4778-bff7-f0a2ece82cd3"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Activate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -266,8 +263,30 @@ public class PlayerControls : IInputActionCollection
                     ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Gamepad"",
                     ""action"": ""Activate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f21f5bf8-60a8-4493-9b4f-3f61d645fbae"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""75d305a1-cbdf-4eb5-b635-cbc44345a2ec"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -692,6 +711,7 @@ public class PlayerControls : IInputActionCollection
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Activate = m_Player.FindAction("Activate", throwIfNotFound: true);
+        m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -758,6 +778,7 @@ public class PlayerControls : IInputActionCollection
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Activate;
+    private readonly InputAction m_Player_Attack;
     public struct PlayerActions
     {
         private PlayerControls m_Wrapper;
@@ -766,6 +787,7 @@ public class PlayerControls : IInputActionCollection
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Fire => m_Wrapper.m_Player_Fire;
         public InputAction @Activate => m_Wrapper.m_Player_Activate;
+        public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -787,6 +809,9 @@ public class PlayerControls : IInputActionCollection
                 Activate.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnActivate;
                 Activate.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnActivate;
                 Activate.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnActivate;
+                Attack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
+                Attack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
+                Attack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttack;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -803,6 +828,9 @@ public class PlayerControls : IInputActionCollection
                 Activate.started += instance.OnActivate;
                 Activate.performed += instance.OnActivate;
                 Activate.canceled += instance.OnActivate;
+                Attack.started += instance.OnAttack;
+                Attack.performed += instance.OnAttack;
+                Attack.canceled += instance.OnAttack;
             }
         }
     }
@@ -962,6 +990,7 @@ public class PlayerControls : IInputActionCollection
         void OnLook(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnActivate(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
