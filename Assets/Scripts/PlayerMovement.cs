@@ -2,9 +2,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum PlayerState
+{
+    walk,
+    attack,
+    interact,
+    transition,
+}
+
 public class PlayerMovement : MonoBehaviour
 {
     public float speed;
+    public PlayerState currentState;
 
     private Rigidbody2D myRigidbody;
     private Vector3 change;
@@ -14,15 +23,18 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        currentState = PlayerState.walk;
         playerInput = GetComponent<PlayerInput>();
         animator = GetComponent<Animator>();
+        animator.SetFloat("moveX", 0);
+        animator.SetFloat("moveY", -1);
         myRigidbody = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (playerInput.actions.FindAction("Attack").triggered && !animator.GetBool("isAttacking"))
+        if (playerInput.actions.FindAction("Attack").triggered && currentState != PlayerState.attack)
         {
             StartCoroutine(AttackCo());
         }
@@ -30,14 +42,15 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator AttackCo()
     {
         animator.SetBool("isAttacking", true);
+        currentState = PlayerState.attack;
         yield return null;
-        yield return new WaitForSeconds(.33f);
         animator.SetBool("isAttacking", false);
-
+        yield return new WaitForSeconds(.33f);
+        currentState = PlayerState.walk;
     }
     void FixedUpdate()
     {
-        if(!animator.GetBool("isAttacking"))
+        if(currentState == PlayerState.walk)
         {
             UpdateAnimationAndMove();
         }
