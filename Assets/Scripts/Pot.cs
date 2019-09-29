@@ -14,12 +14,17 @@ public class Pot : MonoBehaviour
     public void OnBreak()
     {
         anim.SetBool("isBroken", true);
-        StartCoroutine(OnBreakCo());
+        //StartCoroutine(OnBreakCo());
     }
 
-    IEnumerator OnBreakCo()
+    public void OnAnimationComplete()
+    {
+        gameObject.SetActive(false);
+    }
+    //This was old code. As long as events work not need for this.
+    /*IEnumerator OnBreakCo()
     {
         yield return new WaitForSeconds(.3f);
-        this.gameObject.SetActive(false);
-    }
+        gameObject.SetActive(false);
+    }*/
 }
