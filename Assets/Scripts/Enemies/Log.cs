@@ -17,7 +17,6 @@ public class Log : Enemy
     public float chaseRadius;
     public float attackRadius;
     public Transform homePosition;
-    public EnemyState enemyState;
 
     private Animator animator;
 
@@ -42,7 +41,7 @@ public class Log : Enemy
         switch (enemyState)
         {
             case EnemyState.Sleeping:
-                if (Vector3.Distance(target.position, transform.position) <= chaseRadius)
+                if (Vector2.Distance(target.position, transform.position) <= chaseRadius)
                 {
                     animator.SetBool("isAwake", true);
                     enemyState = EnemyState.Waking;
@@ -53,9 +52,22 @@ public class Log : Enemy
                 break;
 
             case EnemyState.Walking:
-                if (Vector3.Distance(target.position, transform.position) <= chaseRadius)
+                if (Vector2.Distance(target.position, transform.position) <= chaseRadius)
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+                    Vector3 movePoint = Vector2.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+                    Vector2 change = movePoint - transform.position;
+                    transform.position = movePoint;
+
+                    change.Normalize();
+                    animator.SetFloat("moveX", change.x);
+                    animator.SetFloat("moveY", change.y);
+
+                    if(Vector2.Distance(target.position, transform.position) <= attackRadius)
+                    {
+                        // For better code this would damage the player
+                        enemyState = EnemyState.Attacking;
+                        animator.SetBool("isIdle", true);
+                    }
                 }
                 else
                 {
@@ -67,6 +79,11 @@ public class Log : Enemy
 
             case EnemyState.Attacking:
                 // Damage the player
+                if (Vector2.Distance(target.position, transform.position) > attackRadius)
+                {
+                    animator.SetBool("isIdle", false);
+                    enemyState = EnemyState.Walking;
+                }
                 break;
 
             case EnemyState.FallingAsleep:
